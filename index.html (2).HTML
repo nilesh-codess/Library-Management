@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Library Management System</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#f7f4ef;
+  --surface:#ffffff;
+  --surface2:#f0ece4;
+  --border:#e0d8cc;
+  --border2:#c8bfb0;
+  --accent:#2d5016;
+  --accent2:#4a7c28;
+  --accent-light:#e8f0dc;
+  --amber:#b45309;
+  --amber-bg:#fef3c7;
+  --red:#991b1b;
+  --red-bg:#fee2e2;
+  --text:#1a1a14;
+  --muted:#7a7060;
+  --radius:12px;
+  --shadow:0 1px 3px rgba(0,0,0,0.08),0 4px 12px rgba(0,0,0,0.06);
+}
+
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  padding:0 0 60px;
+}
+
+/* ── HEADER ── */
+.header{
+  background:var(--accent);
+  padding:28px 32px 24px;
+  position:relative;
+  overflow:hidden;
+}
+.header::before{
+  content:'';
+  position:absolute;
+  right:-60px;top:-60px;
+  width:240px;height:240px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.04);
+}
+.header::after{
+  content:'';
+  position:absolute;
+  right:60px;bottom:-80px;
+  width:160px;height:160px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.03);
+}
+.header-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1;}
+.header-top{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:20px;}
+.logo-area{}
+.logo{
+  font-family:'Playfair Display',serif;
+  font-size:32px;font-weight:800;
+  color:#ffffff;letter-spacing:-0.5px;
+  line-height:1.1;
+}
+.logo span{color:#a3c96a;}
+.logo-sub{font-size:13px;color:rgba(255,255,255,0.55);margin-top:4px;letter-spacing:0.3px;}
+
+.stat-chips{display:flex;gap:10px;flex-wrap:wrap;}
+.stat-chip{
+  background:rgba(255,255,255,0.1);
+  border:1px solid rgba(255,255,255,0.15);
+  border-radius:8px;padding:10px 18px;text-align:center;
+}
+.stat-chip .num{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#fff;line-height:1;}
+.stat-chip .lbl{font-size:11px;color:rgba(255,255,255,0.55);margin-top:3px;}
+
+/* Nav tabs in header */
+.nav-tabs{display:flex;gap:4px;}
+.nav-tab{
+  background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);
+  border-radius:8px;padding:9px 20px;
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;
+  color:rgba(255,255,255,0.6);cursor:pointer;transition:all 0.15s;
+}
+.nav-tab.active{background:rgba(255,255,255,0.2);color:#fff;border-color:rgba(255,255,255,0.3);}
+.nav-tab:hover:not(.active){background:rgba(255,255,255,0.12);color:#fff;}
+
+/* ── MAIN ── */
+.main{max-width:1100px;margin:0 auto;padding:28px 24px;}
+
+/* ── SECTION ── */
+.section{display:none;}
+.section.active{display:block;animation:fadeUp 0.3s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── FORM CARD ── */
+.form-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:28px;margin-bottom:24px;
+  box-shadow:var(--shadow);
+}
+.form-card h2{
+  font-family:'Playfair Display',serif;font-size:22px;font-weight:700;
+  margin-bottom:20px;color:var(--text);letter-spacing:-0.3px;
+}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:18px;}
+.field{display:flex;flex-direction:column;gap:5px;}
+.field label{font-size:12px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:0.5px;}
+.field input,.field select{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:8px;padding:10px 14px;
+  font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);
+  outline:none;transition:border-color 0.15s;
+}
+.field input:focus,.field select:focus{border-color:var(--accent2);}
+.field input::placeholder{color:var(--muted);}
+
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;}
+.btn{
+  padding:10px 24px;border-radius:8px;border:none;
+  font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;
+  cursor:pointer;transition:all 0.15s;
+}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:var(--accent2);}
+.btn-secondary{background:var(--surface2);color:var(--muted);border:1px solid var(--border);}
+.btn-secondary:hover{color:var(--text);border-color:var(--border2);}
+.btn:active{transform:scale(0.97);}
+
+/* ── SEARCH BAR ── */
+.search-bar{
+  display:flex;gap:10px;margin-bottom:20px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:8px 8px 8px 18px;
+  box-shadow:var(--shadow);transition:border-color 0.2s;
+}
+.search-bar:focus-within{border-color:var(--accent2);}
+.search-bar input{
+  flex:1;background:transparent;border:none;outline:none;
+  font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);
+}
+.search-bar input::placeholder{color:var(--muted);}
+.search-bar select{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:8px;padding:8px 12px;font-size:13px;
+  color:var(--muted);outline:none;cursor:pointer;
+}
+.search-btn{
+  background:var(--accent);color:#fff;border:none;
+  border-radius:8px;padding:9px 20px;font-size:13px;font-weight:500;
+  cursor:pointer;transition:opacity 0.15s;white-space:nowrap;
+}
+.search-btn:hover{opacity:0.85;}
+
+/* ── TABLE ── */
+.table-wrap{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);
+}
+.table-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 20px;border-bottom:1px solid var(--border);
+}
+.table-header h3{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--text);}
+.table-count{font-size:12px;color:var(--muted);background:var(--surface2);padding:3px 10px;border-radius:20px;border:1px solid var(--border);}
+
+table{width:100%;border-collapse:collapse;}
+thead th{
+  background:var(--surface2);padding:11px 16px;
+  text-align:left;font-size:11px;font-weight:500;
+  color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;
+  border-bottom:1px solid var(--border);
+}
+tbody tr{border-bottom:1px solid var(--border);transition:background 0.1s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:var(--surface2);}
+tbody td{padding:13px 16px;font-size:13px;color:var(--text);vertical-align:middle;}
+
+.book-title{font-weight:500;font-size:14px;}
+.book-id{font-size:11px;color:var(--muted);margin-top:2px;font-family:monospace;}
+
+/* Status badges */
+.badge{
+  display:inline-block;padding:4px 12px;border-radius:20px;
+  font-size:11px;font-weight:500;white-space:nowrap;
+}
+.badge-available{background:var(--accent-light);color:var(--accent);}
+.badge-issued{background:var(--amber-bg);color:var(--amber);}
+.badge-overdue{background:var(--red-bg);color:var(--red);}
+
+/* Action buttons */
+.act-btn{
+  padding:5px 12px;border-radius:6px;border:1px solid var(--border);
+  font-size:12px;font-weight:500;cursor:pointer;
+  background:var(--surface2);color:var(--muted);
+  transition:all 0.15s;margin-right:4px;
+}
+.act-btn:hover{border-color:var(--border2);color:var(--text);}
+.act-issue{border-color:var(--amber);color:var(--amber);}
+.act-issue:hover{background:var(--amber-bg);}
+.act-return{border-color:var(--accent2);color:var(--accent2);}
+.act-return:hover{background:var(--accent-light);}
+.act-delete{border-color:#e0d8cc;color:var(--red);}
+.act-delete:hover{background:var(--red-bg);}
+
+/* Empty state */
+.empty{
+  text-align:center;padding:56px 20px;color:var(--muted);
+}
+.empty-icon{font-size:44px;margin-bottom:12px;opacity:0.5;}
+.empty p{font-size:15px;}
+.empty small{font-size:13px;color:#bbb;}
+
+/* ── MODAL ── */
+.modal-backdrop{
+  position:fixed;inset:0;background:rgba(0,0,0,0.45);
+  display:flex;align-items:center;justify-content:center;
+  z-index:100;padding:20px;
+  animation:fadeIn 0.2s ease;
+}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.modal{
+  background:var(--surface);border-radius:var(--radius);
+  padding:28px;width:100%;max-width:420px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.2);
+  animation:scaleIn 0.2s ease;
+}
+@keyframes scaleIn{from{transform:scale(0.95);opacity:0;}to{transform:scale(1);opacity:1;}}
+.modal h3{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:6px;}
+.modal p{font-size:14px;color:var(--muted);margin-bottom:20px;line-height:1.6;}
+.modal-book{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:8px;padding:12px 16px;margin-bottom:20px;
+}
+.modal-book .mb-title{font-weight:500;font-size:15px;margin-bottom:3px;}
+.modal-book .mb-meta{font-size:12px;color:var(--muted);}
+.modal .field{margin-bottom:16px;}
+.modal-btns{display:flex;gap:10px;}
+.modal-btns .btn{flex:1;justify-content:center;text-align:center;}
+
+/* ── DASHBOARD ── */
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px;}
+.dash-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);
+}
+.dash-card .dc-icon{font-size:28px;margin-bottom:10px;}
+.dash-card .dc-num{font-family:'Playfair Display',serif;font-size:32px;font-weight:700;line-height:1;}
+.dash-card .dc-lbl{font-size:12px;color:var(--muted);margin-top:4px;}
+.dash-card.dc-green .dc-num{color:var(--accent);}
+.dash-card.dc-amber .dc-num{color:var(--amber);}
+.dash-card.dc-red .dc-num{color:var(--red);}
+.dash-card.dc-blue .dc-num{color:#1d4ed8;}
+
+.recent-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;
+}
+.recent-card h3{
+  font-family:'Playfair Display',serif;font-size:17px;font-weight:700;
+  padding:16px 20px;border-bottom:1px solid var(--border);
+}
+
+/* Toast */
+.toast{
+  position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--accent);color:#fff;
+  padding:12px 24px;border-radius:10px;font-size:14px;font-weight:500;
+  opacity:0;transition:all 0.3s;z-index:999;white-space:nowrap;
+  box-shadow:0 4px 20px rgba(0,0,0,0.15);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.error{background:var(--red);}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div class="header-top">
+      <div class="logo-area">
+        <div class="logo">📚 PustakalayaPro<span>.</span></div>
+        <div class="logo-sub">Library Management System — BCA Project</div>
+      </div>
+      <div class="stat-chips">
+        <div class="stat-chip"><div class="num" id="hTotal">0</div><div class="lbl">Total Books</div></div>
+        <div class="stat-chip"><div class="num" id="hAvail">0</div><div class="lbl">Available</div></div>
+        <div class="stat-chip"><div class="num" id="hIssued">0</div><div class="lbl">Issued</div></div>
+      </div>
+    </div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="showSection('dashboard',this)">📊 Dashboard</button>
+      <button class="nav-tab" onclick="showSection('books',this)">📖 Books</button>
+      <button class="nav-tab" onclick="showSection('addBook',this)">➕ Add Book</button>
+      <button class="nav-tab" onclick="showSection('issued',this)">🔖 Issued</button>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ── DASHBOARD ── -->
+  <div class="section active" id="sec-dashboard">
+    <div class="dash-grid">
+      <div class="dash-card dc-green"><div class="dc-icon">📚</div><div class="dc-num" id="dTotal">0</div><div class="dc-lbl">Total Books</div></div>
+      <div class="dash-card dc-green"><div class="dc-icon">✅</div><div class="dc-num" id="dAvail">0</div><div class="dc-lbl">Available</div></div>
+      <div class="dash-card dc-amber"><div class="dc-icon">📤</div><div class="dc-num" id="dIssued">0</div><div class="dc-lbl">Issued</div></div>
+      <div class="dash-card dc-red"><div class="dc-icon">⚠️</div><div class="dc-num" id="dOverdue">0</div><div class="dc-lbl">Overdue</div></div>
+      <div class="dash-card dc-blue"><div class="dc-icon">👥</div><div class="dc-num" id="dMembers">0</div><div class="dc-lbl">Members</div></div>
+      <div class="dash-card"><div class="dc-icon">📂</div><div class="dc-num" id="dCats">0</div><div class="dc-lbl">Categories</div></div>
+    </div>
+    <div class="recent-card">
+      <h3>Recently Added Books</h3>
+      <div id="recentList"></div>
+    </div>
+  </div>
+
+  <!-- ── ALL BOOKS ── -->
+  <div class="section" id="sec-books">
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Title, author, ya ID se search karo..." oninput="renderBooks()"/>
+      <select id="filterCat" onchange="renderBooks()">
+        <option value="">All Categories</option>
+        <option>Programming</option>
+        <option>Database</option>
+        <option>Networking</option>
+        <option>Mathematics</option>
+        <option>Science</option>
+        <option>Literature</option>
+        <option>History</option>
+        <option>Other</option>
+      </select>
+      <select id="filterStatus" onchange="renderBooks()">
+        <option value="">All Status</option>
+        <option value="available">Available</option>
+        <option value="issued">Issued</option>
+      </select>
+      <button class="search-btn" onclick="renderBooks()">Search</button>
+    </div>
+    <div class="table-wrap">
+      <div class="table-header">
+        <h3>All Books</h3>
+        <span class="table-count" id="bookCount">0 books</span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Book Info</th>
+              <th>Author</th>
+              <th>Category</th>
+              <th>Year</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="bookTableBody"></tbody>
+        </table>
+      </div>
+      <div id="booksEmpty" class="empty" style="display:none">
+        <div class="empty-icon">📭</div>
+        <p>Koi book nahi mili</p>
+        <small>Search clear karo ya nayi book add karo</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ADD BOOK ── -->
+  <div class="section" id="sec-addBook">
+    <div class="form-card">
+      <h2>📖 Nayi Book Add Karo</h2>
+      <div class="form-grid">
+        <div class="field">
+          <label>Book Title *</label>
+          <input type="text" id="fTitle" placeholder="e.g. Let Us C"/>
+        </div>
+        <div class="field">
+          <label>Author *</label>
+          <input type="text" id="fAuthor" placeholder="e.g. Yashavant Kanetkar"/>
+        </div>
+        <div class="field">
+          <label>ISBN / Book ID</label>
+          <input type="text" id="fISBN" placeholder="Auto-generate hoga"/>
+        </div>
+        <div class="field">
+          <label>Category *</label>
+          <select id="fCat">
+            <option value="">Select Category</option>
+            <option>Programming</option>
+            <option>Database</option>
+            <option>Networking</option>
+            <option>Mathematics</option>
+            <option>Science</option>
+            <option>Literature</option>
+            <option>History</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Publication Year</label>
+          <input type="number" id="fYear" placeholder="e.g. 2023" min="1900" max="2099"/>
+        </div>
+        <div class="field">
+          <label>Publisher</label>
+          <input type="text" id="fPublisher" placeholder="e.g. BPB Publications"/>
+        </div>
+        <div class="field">
+          <label>Total Copies</label>
+          <input type="number" id="fCopies" placeholder="1" min="1" value="1"/>
+        </div>
+        <div class="field">
+          <label>Shelf Location</label>
+          <input type="text" id="fShelf" placeholder="e.g. A-12"/>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="addBook()">✅ Book Add Karo</button>
+        <button class="btn btn-secondary" onclick="clearForm()">🗑️ Clear</button>
+      </div>
+    </div>
+
+    <!-- Prefill sample books -->
+    <div class="form-card" style="border-style:dashed;box-shadow:none;">
+      <h2 style="font-size:17px;margin-bottom:12px;">🎯 Demo Data Load Karo</h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">Kuch sample books add karo test karne ke liye:</p>
+      <button class="btn btn-secondary" onclick="loadSampleData()">📦 5 Sample Books Add Karo</button>
+    </div>
+  </div>
+
+  <!-- ── ISSUED BOOKS ── -->
+  <div class="section" id="sec-issued">
+    <div class="search-bar">
+      <input type="text" id="issueSearch" placeholder="Member naam ya book title se search karo..." oninput="renderIssued()"/>
+      <button class="search-btn" onclick="renderIssued()">Search</button>
+    </div>
+    <div class="table-wrap">
+      <div class="table-header">
+        <h3>Issued Books</h3>
+        <span class="table-count" id="issuedCount">0 issued</span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Book</th>
+              <th>Member</th>
+              <th>Issue Date</th>
+              <th>Due Date</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="issuedTableBody"></tbody>
+        </table>
+      </div>
+      <div id="issuedEmpty" class="empty" style="display:none">
+        <div class="empty-icon">📗</div>
+        <p>Koi book issue nahi hai</p>
+        <small>Books section mein jaake issue karo</small>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── ISSUE MODAL ── -->
+<div class="modal-backdrop" id="issueModal" style="display:none">
+  <div class="modal">
+    <h3>📤 Book Issue Karo</h3>
+    <p>Neeche member ki details bharke book issue karo.</p>
+    <div class="modal-book" id="issueBookInfo"></div>
+    <div class="field">
+      <label>Member Name *</label>
+      <input type="text" id="mMember" placeholder="Student ya member ka naam"/>
+    </div>
+    <div class="field">
+      <label>Member ID</label>
+      <input type="text" id="mMemberId" placeholder="Roll no. ya ID"/>
+    </div>
+    <div class="field">
+      <label>Due Date *</label>
+      <input type="date" id="mDueDate"/>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-secondary" onclick="closeModal('issueModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmIssue()">✅ Issue Karo</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── RETURN MODAL ── -->
+<div class="modal-backdrop" id="returnModal" style="display:none">
+  <div class="modal">
+    <h3>📥 Book Return Karo</h3>
+    <p>Yeh book wapas karni hai?</p>
+    <div class="modal-book" id="returnBookInfo"></div>
+    <div class="modal-btns">
+      <button class="btn btn-secondary" onclick="closeModal('returnModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmReturn()">✅ Return Karo</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA ──
+let books = JSON.parse(localStorage.getItem('lib_books') || '[]');
+let issued = JSON.parse(localStorage.getItem('lib_issued') || '[]');
+let currentBookId = null;
+
+function save() {
+  localStorage.setItem('lib_books', JSON.stringify(books));
+  localStorage.setItem('lib_issued', JSON.stringify(issued));
+}
+
+// ── TOAST ──
+function toast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' ' + type : '');
+  setTimeout(() => t.className = 'toast', 3000);
+}
+
+// ── NAV ──
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (id === 'books') renderBooks();
+  if (id === 'issued') renderIssued();
+  if (id === 'dashboard') renderDashboard();
+  updateHeader();
+}
+
+// ── HEADER STATS ──
+function updateHeader() {
+  const avail = books.filter(b => b.status === 'available').length;
+  const iss = books.filter(b => b.status === 'issued').length;
+  document.getElementById('hTotal').textContent = books.length;
+  document.getElementById('hAvail').textContent = avail;
+  document.getElementById('hIssued').textContent = iss;
+}
+
+// ── DASHBOARD ──
+function renderDashboard() {
+  const avail = books.filter(b => b.status === 'available').length;
+  const iss = books.filter(b => b.status === 'issued').length;
+  const today = new Date().toISOString().split('T')[0];
+  const overdue = issued.filter(i => i.active && i.dueDate < today).length;
+  const members = [...new Set(issued.map(i => i.memberName))].length;
+  const cats = [...new Set(books.map(b => b.category))].filter(Boolean).length;
+
+  document.getElementById('dTotal').textContent = books.length;
+  document.getElementById('dAvail').textContent = avail;
+  document.getElementById('dIssued').textContent = iss;
+  document.getElementById('dOverdue').textContent = overdue;
+  document.getElementById('dMembers').textContent = members;
+  document.getElementById('dCats').textContent = cats;
+
+  const recent = [...books].reverse().slice(0, 5);
+  const rList = document.getElementById('recentList');
+  if (recent.length === 0) {
+    rList.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><p>Koi book nahi hai abhi</p><small>Add Book tab se books add karo</small></div>';
+  } else {
+    rList.innerHTML = `<table style="width:100%;border-collapse:collapse;">
+      <thead><tr>
+        <th style="background:#f0ece4;padding:10px 16px;text-align:left;font-size:11px;color:#7a7060;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid #e0d8cc;">Title</th>
+        <th style="background:#f0ece4;padding:10px 16px;text-align:left;font-size:11px;color:#7a7060;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid #e0d8cc;">Author</th>
+        <th style="background:#f0ece4;padding:10px 16px;text-align:left;font-size:11px;color:#7a7060;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid #e0d8cc;">Category</th>
+        <th style="background:#f0ece4;padding:10px 16px;text-align:left;font-size:11px;color:#7a7060;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid #e0d8cc;">Status</th>
+      </tr></thead>
+      <tbody>
+        ${recent.map(b => `<tr style="border-bottom:1px solid #e0d8cc;">
+          <td style="padding:12px 16px;font-size:13px;font-weight:500;">${b.title}</td>
+          <td style="padding:12px 16px;font-size:13px;color:#7a7060;">${b.author}</td>
+          <td style="padding:12px 16px;font-size:13px;">${b.category || '—'}</td>
+          <td style="padding:12px 16px;">${badgeHTML(b.status)}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+  }
+}
+
+function badgeHTML(status) {
+  if (status === 'available') return '<span class="badge badge-available">✅ Available</span>';
+  if (status === 'issued') return '<span class="badge badge-issued">📤 Issued</span>';
+  return '<span class="badge badge-overdue">⚠️ Overdue</span>';
+}
+
+// ── GENERATE ID ──
+function genId() {
+  return 'BK' + Date.now().toString().slice(-6);
+}
+
+// ── ADD BOOK ──
+function addBook() {
+  const title = document.getElementById('fTitle').value.trim();
+  const author = document.getElementById('fAuthor').value.trim();
+  const cat = document.getElementById('fCat').value;
+
+  if (!title) { toast('❌ Title zaruri hai!', 'error'); return; }
+  if (!author) { toast('❌ Author ka naam zaruri hai!', 'error'); return; }
+  if (!cat) { toast('❌ Category select karo!', 'error'); return; }
+
+  const book = {
+    id: document.getElementById('fISBN').value.trim() || genId(),
+    title, author, category: cat,
+    year: document.getElementById('fYear').value || '',
+    publisher: document.getElementById('fPublisher').value.trim(),
+    copies: parseInt(document.getElementById('fCopies').value) || 1,
+    shelf: document.getElementById('fShelf').value.trim(),
+    status: 'available',
+    addedOn: new Date().toLocaleDateString('hi-IN')
+  };
+
+  // Duplicate check
+  if (books.find(b => b.id === book.id)) {
+    toast('❌ Is ID ki book pehle se hai!', 'error'); return;
+  }
+
+  books.push(book);
+  save();
+  clearForm();
+  updateHeader();
+  toast('✅ Book successfully add ho gayi!');
+}
+
+function clearForm() {
+  ['fTitle','fAuthor','fISBN','fYear','fPublisher','fShelf'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('fCat').value = '';
+  document.getElementById('fCopies').value = '1';
+}
+
+// ── SAMPLE DATA ──
+function loadSampleData() {
+  const samples = [
+    {title:'Let Us C',author:'Yashavant Kanetkar',category:'Programming',year:'2020',publisher:'BPB Publications',shelf:'A-01'},
+    {title:'Database Management Systems',author:'Ramakrishnan & Gehrke',category:'Database',year:'2019',publisher:'McGraw Hill',shelf:'B-04'},
+    {title:'Computer Networks',author:'Andrew S. Tanenbaum',category:'Networking',year:'2021',publisher:'Pearson',shelf:'C-07'},
+    {title:'Discrete Mathematics',author:'Kenneth Rosen',category:'Mathematics',year:'2018',publisher:'McGraw Hill',shelf:'D-02'},
+    {title:'Operating System Concepts',author:'Silberschatz & Galvin',category:'Programming',year:'2022',publisher:'Wiley',shelf:'A-09'},
+  ];
+  let added = 0;
+  samples.forEach(s => {
+    const id = genId() + Math.floor(Math.random()*100);
+    if (!books.find(b => b.title === s.title)) {
+      books.push({...s, id, copies:2, status:'available', addedOn: new Date().toLocaleDateString('hi-IN')});
+      added++;
+    }
+  });
+  save(); updateHeader();
+  toast(added > 0 ? `✅ ${added} sample books add ho gayi!` : '⚠️ Sample books pehle se hain!');
+}
+
+// ── RENDER BOOKS TABLE ──
+function renderBooks() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const cat = document.getElementById('filterCat').value;
+  const status = document.getElementById('filterStatus').value;
+
+  let filtered = books.filter(b => {
+    const matchQ = !q || b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q) || b.id.toLowerCase().includes(q);
+    const matchCat = !cat || b.category === cat;
+    const matchStatus = !status || b.status === status;
+    return matchQ && matchCat && matchStatus;
+  });
+
+  document.getElementById('bookCount').textContent = filtered.length + ' book' + (filtered.length !== 1 ? 's' : '');
+  const tbody = document.getElementById('bookTableBody');
+  const empty = document.getElementById('booksEmpty');
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = filtered.map(b => `
+    <tr>
+      <td>
+        <div class="book-title">${b.title}</div>
+        <div class="book-id">${b.id} ${b.shelf ? '• Shelf: '+b.shelf : ''}</div>
+      </td>
+      <td style="color:var(--muted);font-size:13px;">${b.author}</td>
+      <td><span style="font-size:12px;background:var(--surface2);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">${b.category || '—'}</span></td>
+      <td style="color:var(--muted);font-size:13px;">${b.year || '—'}</td>
+      <td>${badgeHTML(b.status)}</td>
+      <td>
+        ${b.status === 'available'
+          ? `<button class="act-btn act-issue" onclick="openIssueModal('${b.id}')">📤 Issue</button>`
+          : `<button class="act-btn act-return" onclick="openReturnModal('${b.id}')">📥 Return</button>`}
+        <button class="act-btn act-delete" onclick="deleteBook('${b.id}')">🗑️</button>
+      </td>
+    </tr>`).join('');
+}
+
+// ── RENDER ISSUED TABLE ──
+function renderIssued() {
+  const q = document.getElementById('issueSearch').value.toLowerCase();
+  const today = new Date().toISOString().split('T')[0];
+
+  let filtered = issued.filter(i => {
+    if (!i.active) return false;
+    return !q || i.memberName.toLowerCase().includes(q) || i.bookTitle.toLowerCase().includes(q);
+  });
+
+  document.getElementById('issuedCount').textContent = filtered.length + ' issued';
+  const tbody = document.getElementById('issuedTableBody');
+  const empty = document.getElementById('issuedEmpty');
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = filtered.map(i => {
+    const overdue = i.dueDate < today;
+    const status = overdue
+      ? '<span class="badge badge-overdue">⚠️ Overdue</span>'
+      : '<span class="badge badge-issued">📤 Issued</span>';
+    return `
+      <tr>
+        <td><div class="book-title">${i.bookTitle}</div><div class="book-id">${i.bookId}</div></td>
+        <td>
+          <div style="font-weight:500;font-size:13px;">${i.memberName}</div>
+          <div style="font-size:11px;color:var(--muted);">${i.memberId || ''}</div>
+        </td>
+        <td style="font-size:13px;color:var(--muted);">${i.issueDate}</td>
+        <td style="font-size:13px;color:${overdue ? 'var(--red)' : 'var(--muted)'};">${i.dueDate}</td>
+        <td>${status}</td>
+        <td><button class="act-btn act-return" onclick="openReturnModalFromIssue('${i.id}')">📥 Return</button></td>
+      </tr>`;
+  }).join('');
+}
+
+// ── DELETE BOOK ──
+function deleteBook(id) {
+  const book = books.find(b => b.id === id);
+  if (!book) return;
+  if (book.status === 'issued') { toast('❌ Issued book delete nahi ho sakti — pehle return karo!', 'error'); return; }
+  if (!confirm(`"${book.title}" ko delete karna chahte ho?`)) return;
+  books = books.filter(b => b.id !== id);
+  save(); updateHeader(); renderBooks();
+  toast('🗑️ Book delete ho gayi.');
+}
+
+// ── ISSUE MODAL ──
+function openIssueModal(id) {
+  const book = books.find(b => b.id === id);
+  if (!book) return;
+  currentBookId = id;
+  document.getElementById('issueBookInfo').innerHTML = `
+    <div class="mb-title">${book.title}</div>
+    <div class="mb-meta">by ${book.author} · ${book.category} · ID: ${book.id}</div>`;
+  document.getElementById('mMember').value = '';
+  document.getElementById('mMemberId').value = '';
+  // Default due date = 14 days from today
+  const due = new Date(); due.setDate(due.getDate() + 14);
+  document.getElementById('mDueDate').value = due.toISOString().split('T')[0];
+  document.getElementById('issueModal').style.display = 'flex';
+}
+
+function confirmIssue() {
+  const member = document.getElementById('mMember').value.trim();
+  const memberId = document.getElementById('mMemberId').value.trim();
+  const dueDate = document.getElementById('mDueDate').value;
+  if (!member) { toast('❌ Member naam zaruri hai!', 'error'); return; }
+  if (!dueDate) { toast('❌ Due date select karo!', 'error'); return; }
+
+  const book = books.find(b => b.id === currentBookId);
+  book.status = 'issued';
+
+  const issueRecord = {
+    id: 'IS' + Date.now(),
+    bookId: book.id,
+    bookTitle: book.title,
+    memberName: member,
+    memberId,
+    issueDate: new Date().toISOString().split('T')[0],
+    dueDate,
+    active: true
+  };
+  issued.push(issueRecord);
+  save(); updateHeader();
+  closeModal('issueModal');
+  renderBooks();
+  toast(`✅ "${book.title}" ${member} ko issue ho gayi!`);
+}
+
+// ── RETURN MODAL ──
+function openReturnModal(bookId) {
+  const book = books.find(b => b.id === bookId);
+  if (!book) return;
+  const rec = issued.find(i => i.bookId === bookId && i.active);
+  currentBookId = bookId;
+  document.getElementById('returnBookInfo').innerHTML = `
+    <div class="mb-title">${book.title}</div>
+    <div class="mb-meta">${rec ? 'Issued to: '+rec.memberName+' · Due: '+rec.dueDate : 'by '+book.author}</div>`;
+  document.getElementById('returnModal').style.display = 'flex';
+}
+
+function openReturnModalFromIssue(issueId) {
+  const rec = issued.find(i => i.id === issueId);
+  if (!rec) return;
+  openReturnModal(rec.bookId);
+}
+
+function confirmReturn() {
+  const book = books.find(b => b.id === currentBookId);
+  if (!book) return;
+  book.status = 'available';
+  const rec = issued.find(i => i.bookId === currentBookId && i.active);
+  if (rec) rec.active = false;
+  save(); updateHeader();
+  closeModal('returnModal');
+  renderBooks(); renderIssued();
+  toast(`📥 "${book.title}" wapas aa gayi!`);
+}
+
+function closeModal(id) {
+  document.getElementById(id).style.display = 'none';
+  currentBookId = null;
+}
+
+// Close modal on backdrop click
+document.querySelectorAll('.modal-backdrop').forEach(bd => {
+  bd.addEventListener('click', e => { if (e.target === bd) bd.style.display = 'none'; });
+});
+
+// ── INIT ──
+updateHeader();
+renderDashboard();
+</script>
+</body>
+</html>
